@@ -1,0 +1,29 @@
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--player-height) + var(--space-8));
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  /* Hide sidebar on mobile */
+  .main-layout > aside {
+    display: none;
+  }
+
+  .main-content {
+    padding-bottom: calc(var(--player-height) + var(--mobile-nav-height) + var(--space-4) + env(safe-area-inset-bottom) + 80px);
+  }
+}
