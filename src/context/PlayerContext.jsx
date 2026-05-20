@@ -119,8 +119,11 @@ export function PlayerProvider({ children }) {
     audio.src = state.currentTrack.audioUrl;
     audio.load();
     if (state.isPlaying) {
-      audio.play().catch(() => {});
+      audio.play().catch(() => dispatch({ type: 'SET_PLAYING', payload: false }));
     }
+    // Guarantee the spinner clears even if canplay/loadeddata never fire
+    const fallback = setTimeout(() => dispatch({ type: 'SET_LOADING', payload: false }), 5000);
+    return () => clearTimeout(fallback);
   }, [state.currentTrack?.id]);
 
   const playTrack = useCallback((track, queue = null, queueIdx = 0) => {
