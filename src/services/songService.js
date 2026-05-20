@@ -18,7 +18,8 @@ export function normalizeSupabaseSong(song) {
     audioUrl: song.audio_url,
     coverUrl: song.cover_url || null,
     genre: song.genre || 'Tamil',
-    language: 'Tamil',
+    language: song.language || 'Tamil',
+    lyrics: song.lyrics || '',
     isUserUploaded: true,
     // Inline meta so getTrackWithMeta passes through cleanly
     artist: { id: null, name: song.artist || 'Unknown Artist', gradient },
@@ -61,7 +62,7 @@ function sanitizeName(name) {
 }
 
 // Upload a single song (audio + optional cover) to Supabase
-export async function uploadSong({ title, artist, album, genre, audioFile, coverFile, onProgress }) {
+export async function uploadSong({ title, artist, album, genre, language, lyrics, audioFile, coverFile, onProgress }) {
   if (!isSupabaseConfigured || !supabase) {
     throw new Error('Supabase is not configured. Please add your environment variables.');
   }
@@ -119,7 +120,8 @@ export async function uploadSong({ title, artist, album, genre, audioFile, cover
       artist: artist.trim(),
       album: album?.trim() || title.trim(),
       genre: genre || 'Melody',
-      language: 'Tamil',
+      language: language || 'Tamil',
+      lyrics: lyrics || '',
       duration,
       audio_url: audioUrl,
       cover_url: coverUrl,

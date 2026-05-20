@@ -6,20 +6,36 @@ import { useToast } from '../../ui/Toast/Toast';
 import { CloseIcon, MusicNoteIcon, CheckIcon, PlusIcon } from '../../ui/Icons/Icons';
 import './UploadModal.css';
 
-const TAMIL_GENRES = [
-  'Melody (மெலடி)',
-  'Kuthu / Party (குத்து)',
-  'Classical (கர்நாடக)',
-  'Folk (நாட்டுப்புறம்)',
-  'Devotional (பக்தி)',
-  'BGM / OST (திரைப்பட BGM)',
-  'Remix (ரீமிக்ஸ்)',
-  'Hip-Hop / Rap (தமிழ் ராப்)',
-  'Duet (இரட்டை)',
-  'Sad (துக்கம்)',
-  'Gaana (காணா)',
-  'Other',
-];
+const GENRES_BY_LANGUAGE = {
+  Tamil: [
+    'Melody (மெலடி)',
+    'Kuthu / Party (குத்து)',
+    'Classical (கர்நாடக)',
+    'Folk (நாட்டுப்புறம்)',
+    'Devotional (பக்தி)',
+    'BGM / OST (திரைப்பட BGM)',
+    'Remix (ரீமிக்ஸ்)',
+    'Hip-Hop / Rap (தமிழ் ராப்)',
+    'Duet (இரட்டை)',
+    'Sad (துக்கம்)',
+    'Gaana (காணா)',
+    'Other',
+  ],
+  English: [
+    'Pop',
+    'Rock',
+    'R&B / Soul',
+    'Hip-Hop / Rap',
+    'Electronic / EDM',
+    'Indie / Alt',
+    'Country',
+    'Jazz',
+    'Classical',
+    'Metal',
+    'Ambient / Chill',
+    'Other',
+  ],
+};
 
 const ACCEPTED_AUDIO = '.mp3,.m4a,.aac,.wav,.ogg,.flac';
 const ACCEPTED_IMAGE = '.jpg,.jpeg,.png,.webp,.avif';
@@ -34,7 +50,9 @@ export default function UploadModal({ onClose }) {
     title: '',
     artist: '',
     album: '',
+    language: 'Tamil',
     genre: 'Melody (மெலடி)',
+    lyrics: '',
   });
   const [audioFile, setAudioFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
@@ -49,7 +67,15 @@ export default function UploadModal({ onClose }) {
   const coverInputRef = useRef(null);
 
   const handleFormChange = (e) => {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm(prev => {
+      const next = { ...prev, [name]: value };
+      // Reset genre when language changes
+      if (name === 'language') {
+        next.genre = GENRES_BY_LANGUAGE[value][0];
+      }
+      return next;
+    });
     setUploadError('');
   };
 
@@ -126,6 +152,8 @@ export default function UploadModal({ onClose }) {
         artist: form.artist.trim(),
         album: form.album.trim() || form.title.trim(),
         genre: form.genre,
+        language: form.language,
+        lyrics: form.lyrics.trim(),
         audioFile,
         coverFile,
         onProgress: setProgress,
@@ -164,7 +192,7 @@ export default function UploadModal({ onClose }) {
               setAudioFile(null);
               setCoverFile(null);
               setCoverPreview(null);
-              setForm({ title: '', artist: '', album: '', genre: 'Melody (மெலடி)' });
+              setForm({ title: '', artist: '', album: '', language: 'Tamil', genre: 'Melody (மெலடி)', lyrics: '' });
             }}>
               Upload Another
             </button>
@@ -297,6 +325,22 @@ export default function UploadModal({ onClose }) {
               </div>
 
               <div className="upload-field">
+                <label className="upload-field-label" htmlFor="u-language">Language</label>
+                <div className="upload-lang-toggle">
+                  {['Tamil', 'English'].map(lang => (
+                    <button
+                      key={lang}
+                      type="button"
+                      className={`upload-lang-btn ${form.language === lang ? 'active' : ''}`}
+                      onClick={() => handleFormChange({ target: { name: 'language', value: lang } })}
+                    >
+                      {lang === 'Tamil' ? '🇮🇳 Tamil' : '🌍 English'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="upload-field">
                 <label className="upload-field-label" htmlFor="u-genre">Genre</label>
                 <select
                   id="u-genre"
@@ -305,7 +349,7 @@ export default function UploadModal({ onClose }) {
                   value={form.genre}
                   onChange={handleFormChange}
                 >
-                  {TAMIL_GENRES.map(g => (
+                  {GENRES_BY_LANGUAGE[form.language].map(g => (
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
@@ -356,6 +400,23 @@ export default function UploadModal({ onClose }) {
               className="upload-file-hidden"
               onChange={e => e.target.files[0] && handleAudioFile(e.target.files[0])}
               aria-label="Choose audio file"
+            />
+          </div>
+
+          {/* Lyrics */}
+          <div className="upload-field">
+            <label className="upload-field-label" htmlFor="u-lyrics">
+              Lyrics
+              <span className="upload-field-hint"> Optional — paste plain text or LRC format for sync</span>
+            </label>
+            <textarea
+              id="u-lyrics"
+              name="lyrics"
+              className="upload-textarea"
+              placeholder={`Paste lyrics here...\n\nFor synchronized lyrics use LRC format:\n[00:15.00] First line\n[00:20.50] Second line`}
+              value={form.lyrics}
+              onChange={handleFormChange}
+              rows={6}
             />
           </div>
 

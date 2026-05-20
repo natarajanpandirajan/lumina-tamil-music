@@ -6,6 +6,7 @@ import {
   trendingTracks, featuredPlaylists, topArtists,
   newReleases, recentlyPlayed as recentData,
   tracks, playlists, albums,
+  englishTracks, tamilMockTracks, tamilArtists, tamilAlbums,
   getTrackWithMeta
 } from '../../services/musicData';
 import TopBar from '../../components/layout/TopBar/TopBar';
@@ -140,6 +141,26 @@ export default function Home() {
             />
           </section>
         )}
+
+        {/* English Hits */}
+        <section className="home-section anim-fade-up delay-4">
+          <SectionHeader title="English Hits" subtitle="Top tracks right now" linkTo="/browse" />
+          <TrackList
+            tracks={englishTracks.slice(0, 5).map(t => getTrackWithMeta(t)).filter(Boolean)}
+            queue={englishTracks.map(t => getTrackWithMeta(t)).filter(Boolean)}
+            showIndex={false}
+          />
+        </section>
+
+        {/* Tamil Classics */}
+        <section className="home-section anim-fade-up delay-4">
+          <SectionHeader title="Tamil Classics" subtitle="Evergreen Tamil songs" linkTo="/browse" />
+          <HorizontalScroll>
+            {tamilAlbums.map(album => (
+              <AlbumCard key={album.id} album={album} />
+            ))}
+          </HorizontalScroll>
+        </section>
 
         {/* Top Artists */}
         <section className="home-section anim-fade-up delay-4">

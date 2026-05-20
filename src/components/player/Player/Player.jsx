@@ -5,8 +5,9 @@ import { formatDuration } from '../../../utils/formatTime';
 import {
   PlayIcon, PauseIcon, SkipNextIcon, SkipPrevIcon,
   ShuffleIcon, RepeatIcon, HeartIcon, VolumeIcon,
-  QueueIcon, DotsIcon, MusicNoteIcon
+  QueueIcon, MusicNoteIcon, LyricsIcon
 } from '../../ui/Icons/Icons';
+import LyricsPanel from '../LyricsPanel/LyricsPanel';
 import './Player.css';
 
 export default function Player() {
@@ -19,6 +20,7 @@ export default function Player() {
     toggleLike, isLiked, toggleQueue,
   } = usePlayer();
   const { addToast } = useToast();
+  const [showLyrics, setShowLyrics] = useState(false);
   const progressRef = useRef(null);
   const volumeRef = useRef(null);
 
@@ -53,6 +55,8 @@ export default function Player() {
   if (!currentTrack) return <PlayerEmpty />;
 
   return (
+    <>
+    {showLyrics && <LyricsPanel onClose={() => setShowLyrics(false)} />}
     <footer className="player" role="complementary" aria-label="Now playing">
       {/* Track info */}
       <div className="player-track">
@@ -144,8 +148,16 @@ export default function Player() {
         </div>
       </div>
 
-      {/* Right: Volume + Queue */}
+      {/* Right: Lyrics + Volume + Queue */}
       <div className="player-right">
+        <button
+          className={`player-ctrl ${showLyrics ? 'active' : ''}`}
+          onClick={() => setShowLyrics(v => !v)}
+          aria-label="Lyrics"
+          title="Lyrics"
+        >
+          <LyricsIcon size={16} />
+        </button>
         <button className="player-ctrl" onClick={toggleQueue} aria-label="Queue">
           <QueueIcon size={16} />
         </button>
@@ -180,6 +192,7 @@ export default function Player() {
         </div>
       </div>
     </footer>
+    </>
   );
 }
 
