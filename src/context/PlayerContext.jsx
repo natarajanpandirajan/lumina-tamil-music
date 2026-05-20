@@ -57,6 +57,7 @@ export function PlayerProvider({ children }) {
   const [likedTracks, setLikedTracks] = useLocalStorage('likedTracks', []);
   const [recentlyPlayed, setRecentlyPlayed] = useLocalStorage('recentlyPlayed', []);
   const audioRef = useRef(new Audio());
+  const skipNextRef = useRef(null);
 
   // Sync audio element properties
   useEffect(() => {
@@ -70,7 +71,7 @@ export function PlayerProvider({ children }) {
         audio.currentTime = 0;
         audio.play().catch(() => {});
       } else {
-        skipNext();
+        skipNextRef.current?.();
       }
     };
     const onError = () => dispatch({ type: 'SET_LOADING', payload: false });
@@ -88,7 +89,7 @@ export function PlayerProvider({ children }) {
       audio.removeEventListener('ended', onEnded);
       audio.removeEventListener('error', onError);
     };
-  }, [state.repeatMode, state.queueIndex]);
+  }, [state.repeatMode]);
 
   // Volume + mute
   useEffect(() => {
@@ -159,6 +160,9 @@ export function PlayerProvider({ children }) {
     dispatch({ type: 'SET_TRACK', payload: nextTrack });
     dispatch({ type: 'SET_QUEUE_INDEX', payload: nextIndex });
   }, [state]);
+
+  // Keep ref current so the audio 'ended' handler always calls the latest skipNext
+  skipNextRef.current = skipNext;
 
   const skipPrev = useCallback(() => {
     const audio = audioRef.current;
