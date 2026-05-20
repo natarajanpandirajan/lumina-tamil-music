@@ -22,7 +22,7 @@ const initialState = {
 function playerReducer(state, action) {
   switch (action.type) {
     case 'SET_TRACK':
-      return { ...state, currentTrack: action.payload, isLoading: true, currentTime: 0 };
+      return { ...state, currentTrack: action.payload, isLoading: true, currentTime: 0, duration: 0 };
     case 'SET_QUEUE':
       return { ...state, queue: action.payload.tracks, queueIndex: action.payload.index };
     case 'SET_PLAYING':
@@ -64,8 +64,13 @@ export function PlayerProvider({ children }) {
     const audio = audioRef.current;
 
     const onTimeUpdate = () => dispatch({ type: 'SET_CURRENT_TIME', payload: audio.currentTime });
-    const onDurationChange = () => dispatch({ type: 'SET_DURATION', payload: audio.duration || 0 });
-    const onLoadedData = () => dispatch({ type: 'SET_LOADING', payload: false });
+    const onDurationChange = () => {
+      const dur = audio.duration;
+      if (isFinite(dur) && dur > 0) {
+        dispatch({ type: 'SET_DURATION', payload: dur });
+      }
+    };
+    const clearLoading = () => dispatch({ type: 'SET_LOADING', payload: false });
     const onEnded = () => {
       if (state.repeatMode === 'one') {
         audio.currentTime = 0;
@@ -74,20 +79,21 @@ export function PlayerProvider({ children }) {
         skipNextRef.current?.();
       }
     };
-    const onError = () => dispatch({ type: 'SET_LOADING', payload: false });
 
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('durationchange', onDurationChange);
-    audio.addEventListener('loadeddata', onLoadedData);
+    audio.addEventListener('canplay', clearLoading);
+    audio.addEventListener('loadeddata', clearLoading);
     audio.addEventListener('ended', onEnded);
-    audio.addEventListener('error', onError);
+    audio.addEventListener('error', clearLoading);
 
     return () => {
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('durationchange', onDurationChange);
-      audio.removeEventListener('loadeddata', onLoadedData);
+      audio.removeEventListener('canplay', clearLoading);
+      audio.removeEventListener('loadeddata', clearLoading);
       audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('error', onError);
+      audio.removeEventListener('error', clearLoading);
     };
   }, [state.repeatMode]);
 
