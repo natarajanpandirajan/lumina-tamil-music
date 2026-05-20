@@ -22,7 +22,7 @@ const initialState = {
 function playerReducer(state, action) {
   switch (action.type) {
     case 'SET_TRACK':
-      return { ...state, currentTrack: action.payload, isLoading: true, currentTime: 0, duration: 0 };
+      return { ...state, currentTrack: action.payload, isLoading: true, currentTime: 0, duration: action.payload?.duration || 0 };
     case 'SET_QUEUE':
       return { ...state, queue: action.payload.tracks, queueIndex: action.payload.index };
     case 'SET_PLAYING':
