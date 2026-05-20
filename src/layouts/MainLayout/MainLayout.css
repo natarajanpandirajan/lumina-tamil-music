@@ -8,7 +8,7 @@
   flex: 1;
   min-width: 0;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: clip;
   padding-bottom: calc(var(--player-height) + var(--space-8));
   scroll-behavior: smooth;
 }

@@ -210,7 +210,7 @@ export default function UploadModal({ onClose }) {
         <div className="upload-modal-header">
           <div className="upload-modal-title-row">
             <span className="upload-modal-icon"><MusicNoteIcon size={18} /></span>
-            <h2 className="upload-modal-title">Upload Tamil Song</h2>
+            <h2 className="upload-modal-title">Upload {form.language} Song</h2>
           </div>
           <button className="upload-close" onClick={onClose} aria-label="Close">
             <CloseIcon size={18} />
