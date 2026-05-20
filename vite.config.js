@@ -36,31 +36,9 @@ export default defineConfig({
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,jpg,webp,woff2}'],
-        runtimeCaching: [
-          {
-            // Cache Supabase audio/image files
-            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'supabase-media',
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              cacheableResponse: { statuses: [0, 200] },
-              rangeRequests: true,
-            },
-          },
-          {
-            // Cache soundhelix sample audio
-            urlPattern: /^https:\/\/www\.soundhelix\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'sample-audio',
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 },
-              cacheableResponse: { statuses: [0, 200] },
-              rangeRequests: true,
-            },
-          },
-        ],
+        cleanupOutdatedCaches: true,
+        globPatterns: [],
+        runtimeCaching: [],
       },
     }),
   ],

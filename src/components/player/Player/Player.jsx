@@ -13,7 +13,7 @@ import './Player.css';
 export default function Player() {
   const {
     currentTrack, isPlaying, isShuffle, repeatMode,
-    volume, isMuted, currentTime, duration, isLoading,
+    volume, isMuted, currentTime, duration, isLoading, audioError,
     togglePlay, skipNext, skipPrev, seek,
     toggleShuffle, cycleRepeat,
     setVolume, toggleMute,
@@ -100,12 +100,15 @@ export default function Player() {
             <SkipPrevIcon size={20} />
           </button>
           <button
-            className={`player-play-btn ${isLoading ? 'loading' : ''}`}
+            className={`player-play-btn ${isLoading ? 'loading' : ''} ${audioError ? 'error' : ''}`}
             onClick={togglePlay}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
+            aria-label={audioError ? 'Audio unavailable' : isPlaying ? 'Pause' : 'Play'}
+            title={audioError ? 'Could not load audio' : undefined}
           >
             {isLoading ? (
               <span className="player-spinner" />
+            ) : audioError ? (
+              <span style={{ fontSize: 18 }}>!</span>
             ) : isPlaying ? (
               <PauseIcon size={22} />
             ) : (

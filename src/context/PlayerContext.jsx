@@ -16,13 +16,16 @@ const initialState = {
   currentTime: 0,
   duration: 0,
   isLoading: false,
+  audioError: false,
   showQueue: false,
 };
 
 function playerReducer(state, action) {
   switch (action.type) {
     case 'SET_TRACK':
-      return { ...state, currentTrack: action.payload, isLoading: true, currentTime: 0, duration: action.payload?.duration || 0 };
+      return { ...state, currentTrack: action.payload, isLoading: true, audioError: false, currentTime: 0, duration: action.payload?.duration || 0 };
+    case 'SET_AUDIO_ERROR':
+      return { ...state, isLoading: false, isPlaying: false, audioError: true };
     case 'SET_QUEUE':
       return { ...state, queue: action.payload.tracks, queueIndex: action.payload.index };
     case 'SET_PLAYING':
@@ -71,6 +74,7 @@ export function PlayerProvider({ children }) {
       }
     };
     const clearLoading = () => dispatch({ type: 'SET_LOADING', payload: false });
+    const onAudioError = () => dispatch({ type: 'SET_AUDIO_ERROR' });
     const onEnded = () => {
       if (state.repeatMode === 'one') {
         audio.currentTime = 0;
@@ -85,7 +89,7 @@ export function PlayerProvider({ children }) {
     audio.addEventListener('canplay', clearLoading);
     audio.addEventListener('loadeddata', clearLoading);
     audio.addEventListener('ended', onEnded);
-    audio.addEventListener('error', clearLoading);
+    audio.addEventListener('error', onAudioError);
 
     return () => {
       audio.removeEventListener('timeupdate', onTimeUpdate);
@@ -93,7 +97,7 @@ export function PlayerProvider({ children }) {
       audio.removeEventListener('canplay', clearLoading);
       audio.removeEventListener('loadeddata', clearLoading);
       audio.removeEventListener('ended', onEnded);
-      audio.removeEventListener('error', clearLoading);
+      audio.removeEventListener('error', onAudioError);
     };
   }, [state.repeatMode]);
 
